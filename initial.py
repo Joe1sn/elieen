@@ -1,10 +1,11 @@
 from setting import *
 from elieen_help import *
 
+path = "./test/"
 
 def set_xient(xient_filename="xient.conf"):
 	try:
-		with open(xient_filename,"w") as file:
+		with open(path+xient_filename,"w") as file:
 			file.write(xient().xient_file())
 		succed("xient config file is generated")
 	except:
@@ -13,7 +14,7 @@ def set_xient(xient_filename="xient.conf"):
 
 def set_dockerfile(dockerfile_name = "Dockerfile"):
 	try:
-		with open(dockerfile_name,"w",encoding="utf-8") as file:
+		with open(path+dockerfile_name,"w",encoding="utf-8") as file:
 			file.write(docker().dockerfile())
 		succed("{filename} is generated".format(filename=dockerfile_name))
 	except (Exception,BaseException) as e:

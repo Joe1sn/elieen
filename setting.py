@@ -8,10 +8,7 @@ class docker(object):
         super(docker, self).__init__()
         with open(config_filename, "r") as file:
             config = json.loads(file.read())
-        self.os = config["docker_info"]["os"]["unix"] + ":" + config["docker_info"]["os"]["version"]
-        self.libc_version = config["docker_info"]["libc_version"]
-        self.image_name = config["docker_info"]["docker_image_name"]
-        self.container_name = config["docker_info"]["docker_container_name"]
+        self.os = config["docker_info"]["os"]["release"] + ":" + config["docker_info"]["os"]["version"]
         self.flag = config["docker_info"]["flag"]
         self.port = config["docker_info"]["port"]
         self.bin_file = config["docker_info"]["filename"]
@@ -19,34 +16,39 @@ class docker(object):
 
     def dockerfile(self, docker_username="pwn",
                    work_dir="/home/pwn",
-                   flag_filename="flag.txt"):
+                   flag_filename="flag.txt",
+                   startup_script_name="service.sh"):
         return \
-            '''FROM {os}
-            
-            RUN sed -i 's/archive.ubuntu.com/asia-east1.gce.archive.ubuntu.com/g' /etc/apt/sources.list && apt update && apt-get install -y lib32z1 xinetd && rm -rf /var/lib/apt/lists/ && rm -rf /root/.cache && apt-get autoclean && rm -rf /tmp/* /var/lib/apt/* /var/cache/* /var/log/*
-            
-            COPY ./{xient_config_filename} /etc/xinetd.d/pwn
-            
-            #add user and flag
-            RUN useradd -m {username} &&echo '{flag}' > {work_dir}/{flag_filename}
-            
-            #copy binary file
-            COPY ./bin/{filename} {work_dir}/{filename}
-            
-            #set execution
-            RUN chown -R root:{username} {work_dir} && chmod -R 750 {work_dir} && chmod 740 {work_dir}/{flag_filename}
-            
-            #copy lib,/bin
-            RUN cp -R /lib* {work_dir} && cp -R /usr/lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin
-            '''.format(
+            "FROM {os}\n" \
+            "RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && apt update && apt-get install -y lib32z1 xinetd && rm -rf /var/lib/apt/lists/ && rm -rf /root/.cache && apt-get autoclean && rm -rf /tmp/* /var/lib/apt/* /var/cache/* /var/log/*\n" \
+            "COPY ./{xient_config_filename} /etc/xinetd.d/pwn\n" \
+            "COPY ./{startup_script_name} /{startup_script_name}\n" \
+            "RUN chmod +x ./{startup_script_name}\n" \
+            "#add user and flag\n" \
+            "RUN useradd -m {username} &&echo '{flag}' > {work_dir}/{flag_filename}\n" \
+            "#copy binary file\n" \
+            "COPY ./bin/{filename} {work_dir}/{filename}\n" \
+            "#set execution\n" \
+            "RUN chown -R root:{username} {work_dir} && chmod -R 750 {work_dir} && chmod 740 {work_dir}/{flag_filename}\n" \
+            "#copy lib,/bin\n" \
+            "RUN cp -R /lib* {work_dir} && cp -R /usr/lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n" \
+            "CMD './{startup_script_name}'\n" \
+                .format(
                 os=self.os,
                 username=docker_username,
                 xient_config_filename=self.xient_config_filename,
                 work_dir=work_dir,
                 flag=self.flag,
                 filename=self.bin_file,
-                flag_filename=flag_filename
+                flag_filename=flag_filename,
+                startup_script_name=startup_script_name
             )
+
+    def docker_composer(self, version="2",
+                        image_list=[],
+                        container_name_list=[],
+                        ):
+        pass
 
 
 class xient(object):
@@ -64,24 +66,25 @@ class xient(object):
 
     def xient_file(self):
         return \
-            '''service {name}
-            {{
-                disable = no
-                socket_type = stream
-                protocol    = {protocol}
-                wait        = no
-                user        = {user}
-                type        = UNLISTED
-                port        = {port}
-                bind        = 0.0.0.0
-                server      = /usr/sbin/chroot   
-                server_args = {server_arg}
-                # safety options
-                per_source  = 10 # the maximum instances of this service per source IP address
-                rlimit_cpu  = 20 # the maximum number of CPU seconds that the service may use
-                rlimit_as  = 100M # the Address Space resource limit for the service
-                #access_times = 2:00-9:00 12:00-24:00
-            }}'''.format(
+            "service {name}\n" \
+            "{{\n" \
+            "    disable = no\n" \
+            "    socket_type = stream\n" \
+            "    protocol    = {protocol}\n" \
+            "    wait        = no\n" \
+            "    user        = {user}\n" \
+            "    type        = UNLISTED\n" \
+            "    port        = {port}\n" \
+            "    bind        = 0.0.0.0\n" \
+            "    server      = /usr/sbin/chroot   \n" \
+            "    server_args = {server_arg}\n" \
+            "    # safety options\n" \
+            "    per_source  = 10 # the maximum instances of this service per source IP address\n" \
+            "    rlimit_cpu  = 20 # the maximum number of CPU seconds that the service may use\n" \
+            "    rlimit_as  = 100M # the Address Space resource limit for the service\n" \
+            "    #access_times = 2:00-9:00 12:00-24:00\n" \
+            "}}\n" \
+                .format(
                 name=self.service_name,
                 protocol=self.protocol,
                 user=self.user,
