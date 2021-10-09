@@ -1,0 +1,24 @@
+{
+    "docker_info":
+    {
+        "os":
+        {
+            "unix":"ubuntu",
+            "version":"16.04"
+        },
+        "libc_version":"libc-2.27.so",
+        "docker_image_name":"CTF-Pwn",
+        "docker_container_name":"pwn1",
+        "flag":"flag{3f162f96616d8d0709ffa3f2a19b8ab4}",
+        "port":9999,
+        "filename":"pwn",
+        "xient_config":"xient.conf"
+    },
+    "xient_info":{
+        "service_name":"ctf",
+        "user":"root",
+        "port":9999,
+        "protocol":"tcp",
+        "server_arg":"--userspec=1000:1000 /home/pwn ./pwn"
+    }
+}
