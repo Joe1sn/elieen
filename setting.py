@@ -18,7 +18,7 @@ class docker(object):
             config = json.loads(file.read())
         self.project_path = config["project_path"]
         self.os = config["docker_info"]["os"]["release"] + ":" + config["docker_info"]["os"]["version"]
-        self.work_dir = config["work_path"]
+        self.work_dir = "/home/"+config["docker_username"]
         self.docker_username=config["docker_username"]
         self.expose = config["docker_info"]["expose"]
         self.flag = "flag{" + md5(bytes(config["docker_info"]["flag"], encoding="utf-8")).hexdigest() + "}"
@@ -102,7 +102,7 @@ class xinetd(object):
         super(xinetd, self).__init__()
         with open(config_filename, "r") as file:
             config = json.loads(file.read())
-        self.work_dir = config["work_path"]
+        self.work_dir = "/home/"+config["docker_username"]
         self.filename = config["filename"]
         self.project_path = config["project_path"]
         self.service_name = config["xinetd_info"]["service_name"]
