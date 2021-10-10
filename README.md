@@ -10,8 +10,9 @@
 
 ```json
 {
-    "project_path": "./test/",
-    "filename":"pwn",
+    "project_path": "./pwn/",
+    "filename":"babyheap",
+    "work_path": "/home/pwn",
     "docker_info":
     {
         "os":
@@ -21,6 +22,7 @@
         },
         "flag":"testtestest",
         "port":9999,
+        "expose": "8000",
         "xinetd_config":"xinetd.conf"
     },
     "xinetd_info":{
@@ -28,13 +30,14 @@
         "user":"root",
         "port":9999,
         "protocol":"tcp",
-        "server_arg":"--userspec=1000:1000 /home/pwn ./"
+        "server_arg":"--userspec=1000:1000 "
     }
 }
 ```
 
 - project_path：docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
 - filename：二进制文件名字
+- work_path：docker中的文件夹
 - docker_info：docker相关信息
   - os：docker操作系统相关，一般为发行版
     - release：操作系统发布版本
