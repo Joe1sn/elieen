@@ -12,7 +12,8 @@
 {
     "project_path": "./pwn/",
     "filename":"babyheap",
-    "work_path": "/home/pwn",
+    "work_path": "/home/babyheap",
+    "docker_username": "babyheap",
     "docker_info":
     {
         "os":
@@ -38,6 +39,7 @@
 - project_path：docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
 - filename：二进制文件名字
 - work_path：docker中的文件夹
+- docker_username：docker中运行程序的用户名
 - docker_info：docker相关信息
   - os：docker操作系统相关，一般为发行版
     - release：操作系统发布版本

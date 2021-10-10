@@ -1,7 +1,8 @@
 {
     "project_path": "./pwn/",
     "filename":"babyheap",
-    "work_path": "/home/pwn",
+    "work_path": "/home/babyheap",
+    "docker_username": "babyheap",
     "docker_info":
     {
         "os":

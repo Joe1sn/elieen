@@ -19,6 +19,7 @@ class docker(object):
         self.project_path = config["project_path"]
         self.os = config["docker_info"]["os"]["release"] + ":" + config["docker_info"]["os"]["version"]
         self.work_dir = config["work_path"]
+        self.docker_username=config["docker_username"]
         self.expose = config["docker_info"]["expose"]
         self.flag = "flag{" + md5(bytes(config["docker_info"]["flag"], encoding="utf-8")).hexdigest() + "}"
         self.port = config["docker_info"]["port"]
@@ -37,8 +38,7 @@ class docker(object):
                 error("path in config.json create failed!")
                 error(e)
 
-    def dockerfile(self, docker_username="pwn",
-                   flag_filename="flag",
+    def dockerfile(self,flag_filename="flag",
                    startup_script_name="service.sh"):
         return \
             "FROM {os}\n" \
@@ -47,7 +47,7 @@ class docker(object):
             "COPY {project_path}{startup_script_name} /{startup_script_name}\n" \
             "RUN chmod +x ./{startup_script_name}\n" \
             "#add user and flag\n" \
-            "RUN useradd -m {username} &&echo '{flag}' > {work_dir}/{flag_filename}\n" \
+            "RUN useradd -m {username} && echo '{flag}' > {work_dir}/{flag_filename}\n" \
             "#copy binary file\n" \
             "COPY {filename} {work_dir}/{filename}\n" \
             "COPY ./catflag {work_dir}/bin/sh\n" \
@@ -58,7 +58,7 @@ class docker(object):
             "CMD './{startup_script_name}'\n" \
                 .format(
                 os=self.os,
-                username=docker_username,
+                username=self.docker_username,
                 xinetd_config_filename=self.xinetd_config_filename,
                 work_dir=self.work_dir,
                 flag=self.flag,
