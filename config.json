@@ -1,4 +1,5 @@
 {
+    "project_path": "./test/",
     "docker_info":
     {
         "os":
@@ -6,13 +7,12 @@
             "release":"ubuntu",
             "version":"16.04"
         },
-        "libc_version":"libc-2.27.so",
-        "flag":"flag{3f162f96616d8d0709ffa3f2a19b8ab4}",
+        "flag":"testtestest",
         "port":9999,
         "filename":"pwn",
-        "xient_config":"xient.conf"
+        "xinetd_config":"xinetd.conf"
     },
-    "xient_info":{
+    "xinetd_info":{
         "service_name":"ctf",
         "user":"root",
         "port":9999,

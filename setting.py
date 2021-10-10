@@ -1,4 +1,12 @@
 import json
+from hashlib import md5
+from elieen_help import *
+import os
+import shutil
+
+
+def basicfile_transport(filename):
+    pass
 
 
 class docker(object):
@@ -8,26 +16,40 @@ class docker(object):
         super(docker, self).__init__()
         with open(config_filename, "r") as file:
             config = json.loads(file.read())
+        self.project_path = config["project_path"]
         self.os = config["docker_info"]["os"]["release"] + ":" + config["docker_info"]["os"]["version"]
-        self.flag = config["docker_info"]["flag"]
+        self.flag = "flag{" + md5(bytes(config["docker_info"]["flag"], encoding="utf-8")).hexdigest() + "}"
         self.port = config["docker_info"]["port"]
-        self.bin_file = config["docker_info"]["filename"]
-        self.xient_config_filename = config["docker_info"]["xient_config"]
+        self.bin_filename = config["docker_info"]["filename"]
+        self.bin_file = os.path.join(self.project_path,config["docker_info"]["filename"])
+        self.xinetd_config_filename = config["docker_info"]["xinetd_config"]
+        self.xinetd_config_file = os.path.join(self.project_path, config["docker_info"]["xinetd_config"])
+
+        if not os.path.exists(self.project_path):
+            warn(self.project_path + "is not exists")
+            warn("now automatic create path " + self.project_path)
+            try:
+                os.makedirs(self.project_path)
+                succed("path is created")
+            except Exception as e:
+                error("path in config.json create failed!")
+                error(e)
 
     def dockerfile(self, docker_username="pwn",
                    work_dir="/home/pwn",
-                   flag_filename="flag.txt",
+                   flag_filename="flag",
                    startup_script_name="service.sh"):
         return \
             "FROM {os}\n" \
             "RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && apt update && apt-get install -y lib32z1 xinetd && rm -rf /var/lib/apt/lists/ && rm -rf /root/.cache && apt-get autoclean && rm -rf /tmp/* /var/lib/apt/* /var/cache/* /var/log/*\n" \
-            "COPY ./{xient_config_filename} /etc/xinetd.d/pwn\n" \
-            "COPY ./{startup_script_name} /{startup_script_name}\n" \
+            "COPY {project_path}{xinetd_config_filename} /etc/xinetd.d/pwn\n" \
+            "COPY {project_path}{startup_script_name} /{startup_script_name}\n" \
             "RUN chmod +x ./{startup_script_name}\n" \
             "#add user and flag\n" \
             "RUN useradd -m {username} &&echo '{flag}' > {work_dir}/{flag_filename}\n" \
             "#copy binary file\n" \
-            "COPY ./bin/{filename} {work_dir}/{filename}\n" \
+            "COPY {filename} {work_dir}/{filename}\n" \
+            "COPY ./catflag /home/pwn/bin/sh\n" \
             "#set execution\n" \
             "RUN chown -R root:{username} {work_dir} && chmod -R 750 {work_dir} && chmod 740 {work_dir}/{flag_filename}\n" \
             "#copy lib,/bin\n" \
@@ -36,13 +58,28 @@ class docker(object):
                 .format(
                 os=self.os,
                 username=docker_username,
-                xient_config_filename=self.xient_config_filename,
+                xinetd_config_filename=self.xinetd_config_filename,
                 work_dir=work_dir,
                 flag=self.flag,
-                filename=self.bin_file,
+                filename=self.bin_filename,
                 flag_filename=flag_filename,
-                startup_script_name=startup_script_name
+                startup_script_name=startup_script_name,
+                project_path=self.project_path
             )
+
+    def set_dockerfile(self, dockerfile_name="Dockerfile"):
+        try:
+            with open(os.path.join(self.project_path,dockerfile_name), "w", encoding="utf-8") as file:
+                file.write(docker().dockerfile())
+            succed("{filename} is generated".format(filename=dockerfile_name))
+            tips("now copy the basic files")
+            shutil.copy("./service.sh", self.project_path)
+            shutil.copy("./catflag", self.project_path)
+            shutil.copy(self.bin_filename, self.project_path)
+
+        except (Exception, BaseException) as e:
+            error("{filename} ocurrd ERROR".format(filename=dockerfile_name))
+            error(e)
 
     def docker_composer(self, version="2",
                         image_list=[],
@@ -51,20 +88,30 @@ class docker(object):
         pass
 
 
-class xient(object):
+class xinetd(object):
     """docstring for xient_info"""
 
     def __init__(self, config_filename="config.json"):
-        super(xient, self).__init__()
+        super(xinetd, self).__init__()
         with open(config_filename, "r") as file:
             config = json.loads(file.read())
-        self.service_name = config["xient_info"]["service_name"]
-        self.user = config["xient_info"]["user"]
-        self.port = config["xient_info"]["port"]
-        self.protocol = config["xient_info"]["protocol"]
-        self.server_arg = config["xient_info"]["server_arg"]
+        self.project_path = config["project_path"]
+        self.service_name = config["xinetd_info"]["service_name"]
+        self.user = config["xinetd_info"]["user"]
+        self.port = config["xinetd_info"]["port"]
+        self.protocol = config["xinetd_info"]["protocol"]
+        self.server_arg = config["xinetd_info"]["server_arg"]
+        if not os.path.exists(self.project_path):
+            warn(self.project_path + "is not exists")
+            warn("now automatic create path " + self.project_path)
+            try:
+                os.makedirs(self.project_path)
+                succed("path is created")
+            except Exception as e:
+                error("path in config.json create failed!")
+                error(e)
 
-    def xient_file(self):
+    def xinetd_file(self):
         return \
             "service {name}\n" \
             "{{\n" \
@@ -91,3 +138,12 @@ class xient(object):
                 port=self.port,
                 server_arg=self.server_arg
             )
+
+    def set_xinetd(self, xinetd_filename="xinetd.conf"):
+        try:
+            with open(os.path.join(self.project_path,xinetd_filename),"w") as file:
+                file.write(xinetd().xinetd_file())
+            succed("xinetd config file is generated")
+        except (Exception, BaseException) as e:
+            error("xinetd config file ocurrd ERROR")
+            error(e)
