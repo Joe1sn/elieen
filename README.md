@@ -11,6 +11,7 @@
 ```json
 {
     "project_path": "./test/",
+    "filename":"pwn",
     "docker_info":
     {
         "os":
@@ -20,27 +21,26 @@
         },
         "flag":"testtestest",
         "port":9999,
-        "filename":"pwn",
-        "xient_config":"xinetd.conf"
+        "xinetd_config":"xinetd.conf"
     },
     "xinetd_info":{
         "service_name":"ctf",
         "user":"root",
         "port":9999,
         "protocol":"tcp",
-        "server_arg":"--userspec=1000:1000 /home/pwn ./pwn"
+        "server_arg":"--userspec=1000:1000 /home/pwn ./"
     }
 }
 ```
 
 - project_path：docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
+- filename：二进制文件名字
 - docker_info：docker相关信息
   - os：docker操作系统相关，一般为发行版
     - release：操作系统发布版本
     - version：版本号
   - flag：原始flag字符串，在`setting.py`中会自动计算md5值
   - port：docker向外暴露的端口
-  - filename：二进制文件名字
   - xinetd_config：xinetd的配置文件名字
 - xinetd_info
   - service_name：xinetd服务名称

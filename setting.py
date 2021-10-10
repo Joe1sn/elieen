@@ -20,8 +20,8 @@ class docker(object):
         self.os = config["docker_info"]["os"]["release"] + ":" + config["docker_info"]["os"]["version"]
         self.flag = "flag{" + md5(bytes(config["docker_info"]["flag"], encoding="utf-8")).hexdigest() + "}"
         self.port = config["docker_info"]["port"]
-        self.bin_filename = config["docker_info"]["filename"]
-        self.bin_file = os.path.join(self.project_path,config["docker_info"]["filename"])
+        self.bin_filename = config["filename"]
+        self.bin_file = os.path.join(self.project_path,config["filename"])
         self.xinetd_config_filename = config["docker_info"]["xinetd_config"]
         self.xinetd_config_file = os.path.join(self.project_path, config["docker_info"]["xinetd_config"])
 
@@ -76,6 +76,9 @@ class docker(object):
             shutil.copy("./service.sh", self.project_path)
             shutil.copy("./catflag", self.project_path)
             shutil.copy(self.bin_filename, self.project_path)
+            tips("using command below to build and run docker")
+            tips("sudo docker build -f <project dir>/Dockerfile -t <image_name> .")
+            tips("sudo docker run -p <expose_port>:<docker_port> -d <image_name>")
 
         except (Exception, BaseException) as e:
             error("{filename} ocurrd ERROR".format(filename=dockerfile_name))
@@ -95,12 +98,13 @@ class xinetd(object):
         super(xinetd, self).__init__()
         with open(config_filename, "r") as file:
             config = json.loads(file.read())
+        self.filename = config["filename"]
         self.project_path = config["project_path"]
         self.service_name = config["xinetd_info"]["service_name"]
         self.user = config["xinetd_info"]["user"]
         self.port = config["xinetd_info"]["port"]
         self.protocol = config["xinetd_info"]["protocol"]
-        self.server_arg = config["xinetd_info"]["server_arg"]
+        self.server_arg = config["xinetd_info"]["server_arg"]+self.filename
         if not os.path.exists(self.project_path):
             warn(self.project_path + "is not exists")
             warn("now automatic create path " + self.project_path)

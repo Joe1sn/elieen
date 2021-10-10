@@ -1,5 +1,6 @@
 {
-    "project_path": "./test/",
+    "project_path": "./test2/",
+    "filename":"free_free_free",
     "docker_info":
     {
         "os":
@@ -9,7 +10,6 @@
         },
         "flag":"testtestest",
         "port":9999,
-        "filename":"pwn",
         "xinetd_config":"xinetd.conf"
     },
     "xinetd_info":{
@@ -17,6 +17,6 @@
         "user":"root",
         "port":9999,
         "protocol":"tcp",
-        "server_arg":"--userspec=1000:1000 /home/pwn ./pwn"
+        "server_arg":"--userspec=1000:1000 /home/pwn ./"
     }
 }
