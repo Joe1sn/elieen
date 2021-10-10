@@ -41,6 +41,7 @@
     - version：版本号
   - flag：原始flag字符串，在`setting.py`中会自动计算md5值
   - port：docker向外暴露的端口
+  - expose：外界连接的端口
   - xinetd_config：xinetd的配置文件名字
 - xinetd_info
   - service_name：xinetd服务名称
