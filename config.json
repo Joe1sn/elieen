@@ -1,0 +1,24 @@
+{
+    "project_path": "./pwn/",
+    "filename":"babyheap",
+    "work_path": "/home/pwn",
+    "docker_info":
+    {
+        "os":
+        {
+            "release":"ubuntu",
+            "version":"16.04"
+        },
+        "flag":"testtestest",
+        "port":9999,
+        "expose": "8000",
+        "xinetd_config":"xinetd.conf"
+    },
+    "xinetd_info":{
+        "service_name":"ctf",
+        "user":"root",
+        "port":9999,
+        "protocol":"tcp",
+        "server_arg":"--userspec=1000:1000 "
+    }
+}
