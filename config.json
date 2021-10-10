@@ -1,6 +1,6 @@
 {
-    "project_path": "./test2/",
-    "filename":"free_free_free",
+    "project_path": "./test/",
+    "filename":"pwn",
     "docker_info":
     {
         "os":
