@@ -1,6 +1,7 @@
 {
-    "project_path": "./test/",
-    "filename":"pwn",
+    "project_path": "./pwn/",
+    "filename":"babyheap",
+    "work_path": "/home/pwn",
     "docker_info":
     {
         "os":
@@ -10,6 +11,7 @@
         },
         "flag":"testtestest",
         "port":9999,
+        "expose": "8000",
         "xinetd_config":"xinetd.conf"
     },
     "xinetd_info":{
@@ -17,6 +19,6 @@
         "user":"root",
         "port":9999,
         "protocol":"tcp",
-        "server_arg":"--userspec=1000:1000 /home/pwn ./"
+        "server_arg":"--userspec=1000:1000 "
     }
 }

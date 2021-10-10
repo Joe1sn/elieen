@@ -18,10 +18,12 @@ class docker(object):
             config = json.loads(file.read())
         self.project_path = config["project_path"]
         self.os = config["docker_info"]["os"]["release"] + ":" + config["docker_info"]["os"]["version"]
+        self.work_dir = config["work_path"]
+        self.expose = config["docker_info"]["expose"]
         self.flag = "flag{" + md5(bytes(config["docker_info"]["flag"], encoding="utf-8")).hexdigest() + "}"
         self.port = config["docker_info"]["port"]
         self.bin_filename = config["filename"]
-        self.bin_file = os.path.join(self.project_path,config["filename"])
+        self.bin_file = os.path.join(self.project_path, config["filename"])
         self.xinetd_config_filename = config["docker_info"]["xinetd_config"]
         self.xinetd_config_file = os.path.join(self.project_path, config["docker_info"]["xinetd_config"])
 
@@ -36,20 +38,19 @@ class docker(object):
                 error(e)
 
     def dockerfile(self, docker_username="pwn",
-                   work_dir="/home/pwn",
                    flag_filename="flag",
                    startup_script_name="service.sh"):
         return \
             "FROM {os}\n" \
             "RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && apt update && apt-get install -y lib32z1 xinetd && rm -rf /var/lib/apt/lists/ && rm -rf /root/.cache && apt-get autoclean && rm -rf /tmp/* /var/lib/apt/* /var/cache/* /var/log/*\n" \
-            "COPY {project_path}{xinetd_config_filename} /etc/xinetd.d/pwn\n" \
+            "COPY {project_path}{xinetd_config_filename} /etc/xinetd.d/{filename}\n" \
             "COPY {project_path}{startup_script_name} /{startup_script_name}\n" \
             "RUN chmod +x ./{startup_script_name}\n" \
             "#add user and flag\n" \
             "RUN useradd -m {username} &&echo '{flag}' > {work_dir}/{flag_filename}\n" \
             "#copy binary file\n" \
             "COPY {filename} {work_dir}/{filename}\n" \
-            "COPY ./catflag /home/pwn/bin/sh\n" \
+            "COPY ./catflag {work_dir}/bin/sh\n" \
             "#set execution\n" \
             "RUN chown -R root:{username} {work_dir} && chmod -R 750 {work_dir} && chmod 740 {work_dir}/{flag_filename}\n" \
             "#copy lib,/bin\n" \
@@ -59,7 +60,7 @@ class docker(object):
                 os=self.os,
                 username=docker_username,
                 xinetd_config_filename=self.xinetd_config_filename,
-                work_dir=work_dir,
+                work_dir=self.work_dir,
                 flag=self.flag,
                 filename=self.bin_filename,
                 flag_filename=flag_filename,
@@ -69,7 +70,7 @@ class docker(object):
 
     def set_dockerfile(self, dockerfile_name="Dockerfile"):
         try:
-            with open(os.path.join(self.project_path,dockerfile_name), "w", encoding="utf-8") as file:
+            with open(os.path.join(self.project_path, dockerfile_name), "w", encoding="utf-8") as file:
                 file.write(docker().dockerfile())
             succed("{filename} is generated".format(filename=dockerfile_name))
             tips("now copy the basic files")
@@ -77,8 +78,11 @@ class docker(object):
             shutil.copy("./catflag", self.project_path)
             shutil.copy(self.bin_filename, self.project_path)
             tips("using command below to build and run docker")
-            tips("sudo docker build -f <project dir>/Dockerfile -t <image_name> .")
-            tips("sudo docker run -p <expose_port>:<docker_port> -d <image_name>")
+            tips("  sudo docker build -f {project_dir}Dockerfile -t {image_name} .".format( project_dir=self.project_path,
+                                                                                            image_name=self.bin_filename))
+            tips("  sudo docker run -p {expose_port}:{docker_port} -d {image_name}".format(docker_port=self.port,
+                                                                                           image_name=self.bin_filename,
+                                                                                           expose_port=self.expose))
 
         except (Exception, BaseException) as e:
             error("{filename} ocurrd ERROR".format(filename=dockerfile_name))
@@ -98,13 +102,14 @@ class xinetd(object):
         super(xinetd, self).__init__()
         with open(config_filename, "r") as file:
             config = json.loads(file.read())
+        self.work_dir = config["work_path"]
         self.filename = config["filename"]
         self.project_path = config["project_path"]
         self.service_name = config["xinetd_info"]["service_name"]
         self.user = config["xinetd_info"]["user"]
         self.port = config["xinetd_info"]["port"]
         self.protocol = config["xinetd_info"]["protocol"]
-        self.server_arg = config["xinetd_info"]["server_arg"]+self.filename
+        self.server_arg = config["xinetd_info"]["server_arg"]
         if not os.path.exists(self.project_path):
             warn(self.project_path + "is not exists")
             warn("now automatic create path " + self.project_path)
@@ -140,12 +145,12 @@ class xinetd(object):
                 protocol=self.protocol,
                 user=self.user,
                 port=self.port,
-                server_arg=self.server_arg
+                server_arg=self.server_arg + " " + self.work_dir + " ./" + self.filename
             )
 
     def set_xinetd(self, xinetd_filename="xinetd.conf"):
         try:
-            with open(os.path.join(self.project_path,xinetd_filename),"w") as file:
+            with open(os.path.join(self.project_path, xinetd_filename), "w") as file:
                 file.write(xinetd().xinetd_file())
             succed("xinetd config file is generated")
         except (Exception, BaseException) as e:
