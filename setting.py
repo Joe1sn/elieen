@@ -5,25 +5,30 @@ import os
 import shutil
 
 
-def basicfile_transport(filename):
-    pass
+def read_config(config_filename="config.json"):
+    try:
+        with open(config_filename, "r") as file:
+            return json.loads(file.read())
+    except Exception as e:
+        error("open config file ERROR")
+        error(e)
 
 
-class docker(object):
+class pwn_docker(object):
     """docstring for docker_info"""
 
-    def __init__(self, config_filename="config.json"):
-        super(docker, self).__init__()
+    def __init__(self):
+        super(pwn_docker, self).__init__()
         self.docker_list = []
-        self.compose_header = "version: '2'\n"\
+        self.compose_header = "version: '2'\n" \
                               "services:\n"
-        with open(config_filename, "r") as file:
-            config = json.loads(file.read())
-        for pwn_docker in config["pwn_dockers"]:
-            self.docker_list.append(pwn_docker)
+        config = read_config()
 
-        for pwn_docker in self.docker_list:
-            project_path = pwn_docker["project_path"]
+        for docker in config["pwn_dockers"]:
+            self.docker_list.append(docker)
+
+        for docker in self.docker_list:
+            project_path = docker["project_path"]
             if not os.path.exists(project_path):
                 warn(project_path + "is not exists")
                 warn("now automatic create path " + project_path)
@@ -70,7 +75,7 @@ class docker(object):
             try:
                 path = dockerfile["project_path"]
                 with open(os.path.join(path, dockerfile_name), "w", encoding="utf-8") as file:
-                    file.write(docker().dockerfile(dockerfile))
+                    file.write(self.dockerfile(dockerfile))
                 succed(
                     "{filename} is generated".format(filename=os.path.join(path, dockerfile_name)))
                 tips("now copy the basic files")
@@ -96,46 +101,36 @@ class docker(object):
         tips("--------GENERATE DOCKER_COMPOSE--------")
         for dockerfile in self.docker_list:
             try:
-                self.compose_header += "    "+dockerfile["image_name"]+":\n"
-                self.compose_header += "        image: "+dockerfile["image_name"]+"\n"
-                self.compose_header += "        build: "+dockerfile["project_path"]+"\n"
-                self.compose_header += "        container_name: "+dockerfile["image_name"]+"\n"
+                self.compose_header += "    " + dockerfile["image_name"] + ":\n"
+                self.compose_header += "        image: " + dockerfile["image_name"] + "\n"
+                self.compose_header += "        build: " + dockerfile["project_path"] + "\n"
+                self.compose_header += "        container_name: " + dockerfile["image_name"] + "\n"
                 self.compose_header += "        ports:\n"
-                self.compose_header += "            - "+str(dockerfile["docker_info"]["expose"])+":"+str(dockerfile["port"])+"\n"
+                self.compose_header += "            - " + str(dockerfile["docker_info"]["expose"]) + ":" + str(
+                    dockerfile["port"]) + "\n"
             except Exception as e:
                 error("docker compose file ERROR")
                 error(e)
         try:
-            with open("docker-compose.yml","w") as file:
+            with open("docker-compose.yml", "w") as file:
                 file.write(self.compose_header)
             succed("docker-compose.yml generate success")
+            tips("use command below to run docker")
+            tips(" sudo docker-compose up --build -d")
         except Exception as e:
             error("docker-compose.yml generate failed")
             error(e)
-
-
-        # return  " babyheap:\n"\
-        #         "   image: babyheap:latest\n"\
-        #         "   build: .\pwn1\\n"\
-        #         "   container_name: babyheap\n"\
-        #         "   ports:\n"\
-        #         "    - 8000:9999\n"\
-        #         " babyheap2:\n"\
-        #         "  image: babyheap2:latest\n"\
-        #         "  build: .\pwn2\\n"\
-        #         "  container_name: babyheap2\n"\
-        #         "  ports:\n"\
-        #         "   - 8001:8000\n"
+        print()
 
 
 class xinetd(object):
     """docstring for xient_info"""
 
-    def __init__(self, config_filename="config.json"):
+    def __init__(self, ):
         super(xinetd, self).__init__()
         self.xinetd_list = []
-        with open(config_filename, "r") as file:
-            config = json.loads(file.read())
+        config = read_config()
+
         for dockerfile in config["pwn_dockers"]:
             self.xinetd_list.append(dockerfile)
 
@@ -182,7 +177,7 @@ class xinetd(object):
             )
 
     def set_xinetd(self, xinetd_filename="xinetd.conf"):
-        tips("--------GENERATE XINETD FILE--------")
+        # tips("--------GENERATE XINETD FILE--------")
         for config in self.xinetd_list:
             try:
                 with open(os.path.join(config["project_path"], xinetd_filename), "w") as file:
@@ -192,3 +187,57 @@ class xinetd(object):
                 error(config["project_path"] + " xinetd config file ocurrd ERROR")
                 error(e)
         print()
+
+
+class web_docker(object):
+    def __init__(self, config_filename="config.json"):
+        self.docker_list = []
+        super(web_docker, self).__init__()
+        config = read_config()
+        for docker in config["web_dockers"]:
+            self.docker_list.append(docker)
+
+        tips("--------CHECK DOCKER FILE FLODERS--------")
+        for docker in self.docker_list:
+            project_path = docker["project_path"]
+            if not os.path.exists(project_path):
+                error(project_path + "is not exists")
+                exit()
+        tips("--------SEEMS_OK---")
+
+    def dockerfile(self, tmp_docker):
+        return \
+        "FROM {environment}:{version}\n" \
+        "COPY {project_path}. {web_path}\n" \
+        "CMD {start_cmd}\n".format(
+            environment=tmp_docker["environment"],
+            version=tmp_docker["version"],
+            project_path=tmp_docker["project_path"],
+            web_path=tmp_docker["web_path"],
+            start_cmd=tmp_docker["start_cmd"]
+        )
+
+    def set_dockerfile(self):
+        for docker in self.docker_list:
+            if docker["need_compose"] == "N":
+                try:
+                    with open(docker["project_path"]+"Dockerfile",'w') as file:
+                        file.write(self.dockerfile(docker))
+                        succed(docker["project_path"]+"Dockerfile generated")
+                        tips("  sudo docker build -f {project_dir}Dockerfile -t {image_name} .".format(
+                            project_dir=docker["project_path"],
+                            image_name=docker["image_name"]))
+
+                        tips("  sudo docker run -p {expose_port}:{docker_port} -d {image_name}".format(
+                            docker_port=docker["port"],
+                            image_name=docker["image_name"],
+                            expose_port=docker["expose"]))
+                except Exception as e:
+                    error("web dockerfile generate ERROR")
+                    error(e)
+            else:
+                error(docker["project_path"]+" please use web_docker().docker_composer()")
+                continue
+
+    def test(self):
+        print(web_docker.dockerfile(self,self.docker_list[0]))

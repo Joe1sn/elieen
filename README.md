@@ -53,6 +53,31 @@
         "server_arg": "--userspec=1000:1000 "
       }
     }
+  ],
+  "web_dockers": [
+    {
+      "need_compose": "Y",
+      "image_name": "web_test2",
+      "project_path": "./web_test/",
+      "web_path": "/var/www/html",
+      "environment": "mattrayner/lamp",
+      "version": "latest-1804",
+      "expose": 10000,
+      "port": 80,
+      "start_cmd": "./start-apache2.sh"
+    },
+    {
+      "need_compose": "N",
+      "image_name": "web_test2",
+      "project_path": "./web_test2/",
+      "web_path": "/var/www/html",
+      "environment": "mattrayner/lamp",
+      "version": "latest-1804",
+      "expose": 10000,
+      "port": 80,
+      "start_cmd": "./start-apache2.sh",
+      "flag_filename": "flag"
+    }
   ]
 }
 ```
@@ -75,6 +100,17 @@
   - port：xinetd作用的端口
   - protocol：通讯协议
   - server_arg：服务参数
+- web_dockers：web类docker部署相关
+  - need_compose：是否需要使用docker-compose部署
+  - image_name：镜像名称
+  - project_name：web题所在目录
+  - web_path：在docker中的目录
+  - environment：web基础环境
+  - version：环境版本
+  - expose：暴露的端口
+  - port：docker端口
+  - start_cmd：开启命令
+  - flag_filename：flag文件名称
 
 运行
 
