@@ -1,0 +1,14 @@
+version: '2'
+services:
+    babyheap:
+        image: babyheap
+        build: ./pwn1/
+        container_name: babyheap
+        ports:
+            - 8000:9999
+    babyheap2:
+        image: babyheap2
+        build: ./pwn2/
+        container_name: babyheap2
+        ports:
+            - 8001:8000

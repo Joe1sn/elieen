@@ -1,24 +1,48 @@
 {
-    "project_path": "./pwn/",
-    "filename":"babyheap",
-    "docker_username": "babyheap",
-    "docker_info":
+  "pwn_dockers": [
     {
-        "os":
-        {
-            "release":"ubuntu",
-            "version":"16.04"
+      "project_path": "./pwn1/",
+      "filename": "babyheap",
+      "image_name": "babyheap",
+      "docker_username": "pwn1",
+      "port": 9999,
+      "docker_info": {
+        "os": {
+          "release": "ubuntu",
+          "version": "16.04"
         },
-        "flag":"testtestest",
-        "port":9999,
-        "expose": "8000",
-        "xinetd_config":"xinetd.conf"
+        "flag": "test1",
+        "expose": 8000,
+        "xinetd_config": "xinetd.conf"
+      },
+      "xinetd_info": {
+        "service_name": "ctf",
+        "user": "root",
+        "protocol": "tcp",
+        "server_arg": "--userspec=1000:1000 "
+      }
     },
-    "xinetd_info":{
-        "service_name":"ctf",
-        "user":"root",
-        "port":9999,
-        "protocol":"tcp",
-        "server_arg":"--userspec=1000:1000 "
+    {
+      "project_path": "./pwn2/",
+      "filename": "babyheap",
+      "docker_username": "pwn2",
+      "image_name": "babyheap2",
+      "port": 8000,
+      "docker_info": {
+        "os": {
+          "release": "ubuntu",
+          "version": "18.04"
+        },
+        "flag": "test2",
+        "expose": 8001,
+        "xinetd_config": "xinetd.conf"
+      },
+      "xinetd_info": {
+        "service_name": "ctf",
+        "user": "root",
+        "protocol": "tcp",
+        "server_arg": "--userspec=1000:1000 "
+      }
     }
+  ]
 }
