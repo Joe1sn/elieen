@@ -48,6 +48,14 @@
   "web_dockers": [
     {
       "need_compose": "Y",
+      "db": {
+        "database": "mysql",
+        "version": "latest",
+        "user": "admin",
+        "passwd": "admin",
+        "port": "3306",
+        "sql_file": "build.sql"
+      },
       "image_name": "web_test2",
       "project_path": "./web_test/",
       "web_path": "/var/www/html",
@@ -64,10 +72,9 @@
       "web_path": "/var/www/html",
       "environment": "mattrayner/lamp",
       "version": "latest-1804",
-      "expose": 10000,
+      "expose": 10003,
       "port": 80,
-      "start_cmd": "./start-apache2.sh",
-      "flag_filename": "flag"
+      "start_cmd": "./start-apache2.sh"
     }
   ]
 }

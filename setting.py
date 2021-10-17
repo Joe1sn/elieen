@@ -239,5 +239,5 @@ class web_docker(object):
                 error(docker["project_path"]+" please use web_docker().docker_composer()")
                 continue
 
-    def test(self):
-        print(web_docker.dockerfile(self,self.docker_list[0]))
+    def set_compose(self):
+        pass
