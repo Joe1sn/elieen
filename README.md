@@ -1,6 +1,6 @@
-flag{asouasoulasoulasoul}
-
 # ELIEEN：使用JSON配置CTF-Pwn中的Docker容器
+
+> 该项目构建的docker能够直接在ctfd-whale中启用
 
 之前大家都爱用的：pwn_deploy_chroot要修改版本或者libc很麻烦，要到处找配置修改，所以我想的就是让所有配置信息都在`config.json`中，这样就可以简化配置流程了
 
@@ -55,40 +55,17 @@ flag{asouasoulasoulasoul}
         "server_arg": "--userspec=1000:1000 "
       }
     }
-  ],
-  "web_dockers": [
-    {
-      "need_compose": "Y",
-      "image_name": "web_test2",
-      "project_path": "./web_test/",
-      "web_path": "/var/www/html",
-      "environment": "mattrayner/lamp",
-      "version": "latest-1804",
-      "expose": 10000,
-      "port": 80,
-      "start_cmd": "./start-apache2.sh"
-    },
-    {
-      "need_compose": "N",
-      "image_name": "web_test2",
-      "project_path": "./web_test2/",
-      "web_path": "/var/www/html",
-      "environment": "mattrayner/lamp",
-      "version": "latest-1804",
-      "expose": 10000,
-      "port": 80,
-      "start_cmd": "./start-apache2.sh",
-      "flag_filename": "flag"
-    }
   ]
 }
 ```
+
+大多数使用默认参数就行
 
 - pwn_dockers：pwn类配置
 - project_path：docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
 - filename：二进制文件名字
 - docker_username：docker中运行程序的用户名
-- port：docker向外暴露的端口
+- port：docker向外暴露的内部端口
 - docker_info：docker相关信息
   - os：docker操作系统相关，一般为发行版
     - release：操作系统发布版本
@@ -102,17 +79,8 @@ flag{asouasoulasoulasoul}
   - port：xinetd作用的端口
   - protocol：通讯协议
   - server_arg：服务参数
-- web_dockers：web类docker部署相关
-  - need_compose：是否需要使用docker-compose部署
-  - image_name：镜像名称
-  - project_name：web题所在目录
-  - web_path：在docker中的目录
-  - environment：web基础环境
-  - version：环境版本
-  - expose：暴露的端口
-  - port：docker端口
-  - start_cmd：开启命令
-  - flag_filename：flag文件名称
+
+一般配置过程变量使用json中的参数 `-p expose:port`
 
 运行
 
@@ -125,8 +93,3 @@ python3 initial.py
 ```shell
 sudo docker-compose up --build -d
 ```
-
-
-
-
-
