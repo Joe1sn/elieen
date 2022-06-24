@@ -1,5 +1,6 @@
 import json
 from hashlib import md5
+from sys import float_repr_style
 from elieen_help import *
 import os
 import shutil
@@ -79,9 +80,20 @@ class pwn_docker(object):
                 succed(
                     "{filename} is generated".format(filename=os.path.join(path, dockerfile_name)))
                 tips("now copy the basic files")
+                
                 shutil.copy("./basic/service.sh", path)
                 shutil.copy("./basic/catflag", path)
                 shutil.copy(dockerfile["filename"], path)
+                with open(path+"service.sh","a",encoding='utf-8') as conf:
+                    str = '''
+echo $FLAG > /home/{user}/flag
+chown root:{user} /home/{user}/flag
+chmod 640 /home/{user}/flag
+export FLAG=not_flag
+FLAG=not_flag
+                    '''.format(user=dockerfile["docker_username"])
+                    conf.write(str)
+
                 tips("using command below to build and run docker")
                 tips("  sudo docker build -f {project_dir}Dockerfile -t {image_name} .".format(
                     project_dir=dockerfile["project_path"],
