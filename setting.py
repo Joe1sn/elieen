@@ -84,14 +84,14 @@ class pwn_docker(object):
                 shutil.copy("./basic/service.sh", path)
                 shutil.copy("./basic/catflag", path)
                 shutil.copy(dockerfile["filename"], path)
-                with open(path+"service.sh","a",encoding='utf-8') as conf:
-                    str = '''
-echo $FLAG > /home/{user}/flag
+                with open(path+"service.sh","w",encoding='utf-8') as conf:
+                    str = '''echo $FLAG > /home/{user}/flag
 chown root:{user} /home/{user}/flag
 chmod 640 /home/{user}/flag
 export FLAG=not_flag
 FLAG=not_flag
-                    '''.format(user=dockerfile["docker_username"])
+/etc/init.d/xinetd start;
+sleep infinity;'''.format(user=dockerfile["docker_username"])
                     conf.write(str)
 
                 tips("using command below to build and run docker")
