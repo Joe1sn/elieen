@@ -1,6 +1,6 @@
 # ELIEEN：使用JSON配置CTF-Pwn中的Docker容器
 
-![](https://img.shields.io/badge/joe1sn-ELIEEN-green)![](https://img.shields.io/badge/python-3.7-yellow)
+![](https://img.shields.io/badge/joe1sn-ELIEEN-green)  ![](https://img.shields.io/badge/python-3.7-yellow)
 
 > 该项目构建的docker能够直接在ctfd-whale中启用
 
