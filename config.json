@@ -31,7 +31,7 @@
       "docker_info": {
         "os": {
           "release": "ubuntu",
-          "version": "18.04"
+          "version": "20.04"
         },
         "flag": "test2",
         "expose": 8001,

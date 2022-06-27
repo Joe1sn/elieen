@@ -42,23 +42,25 @@ class pwn_docker(object):
 
     def dockerfile(self, tmp_docker, flag_filename="flag",
                    startup_script_name="service.sh"):
-        return \
-            "FROM {os}\n" \
-            "RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && apt update && apt-get install -y lib32z1 xinetd && rm -rf /var/lib/apt/lists/ && rm -rf /root/.cache && apt-get autoclean && rm -rf /tmp/* /var/lib/apt/* /var/cache/* /var/log/*\n" \
-            "COPY {xinetd_config_filename} /etc/xinetd.d/{filename}\n" \
-            "COPY {startup_script_name} /{startup_script_name}\n" \
-            "RUN chmod +x ./{startup_script_name}\n" \
-            "#add user and flag\n" \
-            "RUN useradd -m {username} && echo '{flag}' > {work_dir}/{flag_filename}\n" \
-            "#copy binary file\n" \
-            "COPY {filename} {work_dir}/{filename}\n" \
-            "COPY ./catflag {work_dir}/bin/sh\n" \
-            "#set execution\n" \
-            "RUN chown -R root:{username} {work_dir} && chmod -R 750 {work_dir} && chmod 740 {work_dir}/{flag_filename}\n" \
-            "#copy lib,/bin\n" \
-            "RUN cp -R /lib* {work_dir} && cp -R /usr/lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n" \
-            "CMD './{startup_script_name}'\n" \
-                .format(
+            str = "FROM {os}\n"
+            str += "RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && apt update && apt-get install -y lib32z1 xinetd && rm -rf /var/lib/apt/lists/ && rm -rf /root/.cache && apt-get autoclean && rm -rf /tmp/* /var/lib/apt/* /var/cache/* /var/log/*\n"
+            str += "COPY {xinetd_config_filename} /etc/xinetd.d/{filename}\n"
+            str += "COPY {startup_script_name} /{startup_script_name}\n"
+            str += "RUN chmod +x ./{startup_script_name}\n"
+            str += "#add user and flag\n"
+            str += "RUN useradd -m {username} && echo '{flag}' > {work_dir}/{flag_filename}\n"
+            str += "#copy binary file\n"
+            str += "COPY {filename} {work_dir}/{filename}\n"
+            str += "COPY ./catflag {work_dir}/bin/sh\n"
+            str += "#set execution\n"
+            str += "RUN chown -R root:{username} {work_dir} && chmod -R 750 {work_dir} && chmod 740 {work_dir}/{flag_filename}\n"
+            str += "#copy lib,/bin\n"
+            if int(tmp_docker["docker_info"]["os"]["version"][:2]) < 19:
+                str += "RUN cp -R /lib* {work_dir} && cp -R /usr/lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n"
+            else:
+                str += "RUN cp -R /lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n"
+            str += "CMD './{startup_script_name}'\n"
+            str.format(
                 os=tmp_docker["docker_info"]["os"]["release"] + ':' + tmp_docker["docker_info"]["os"]["version"],
                 username=tmp_docker["docker_username"],
                 xinetd_config_filename=tmp_docker["docker_info"]["xinetd_config"],
@@ -69,6 +71,7 @@ class pwn_docker(object):
                 startup_script_name=startup_script_name,
                 project_path=tmp_docker["project_path"]
             )
+            return str
 
     def set_dockerfile(self, dockerfile_name="Dockerfile"):
         tips("--------GENERATE DOCKERFILE--------")
