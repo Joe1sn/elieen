@@ -58,7 +58,7 @@ class pwn_docker(object):
             if int(tmp_docker["docker_info"]["os"]["version"][:2]) < 19:
                 str += "RUN cp -R /lib* {work_dir} && cp -R /usr/lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n"
             else:
-                str += "RUN cp -R /lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n"
+                str += "RUN cp -R /usr/lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n"
             str += "CMD './{startup_script_name}'\n"
             str=str.format(
                 os=tmp_docker["docker_info"]["os"]["release"] + ':' + tmp_docker["docker_info"]["os"]["version"],
@@ -88,11 +88,14 @@ class pwn_docker(object):
                 shutil.copy("./basic/catflag", path)
                 shutil.copy(dockerfile["filename"], path)
                 with open(path+"service.sh","w",encoding='utf-8') as conf:
-                    str = '''echo $FLAG > /home/{user}/flag
-chown root:{user} /home/{user}/flag
-chmod 640 /home/{user}/flag
-export FLAG=not_flag
-FLAG=not_flag
+                    str = '''
+if [ -n "$FLAG" ]; then
+    echo $FLAG > /home/{user}/flag
+    chown root:{user} /home/{user}/flag
+    chmod 640 /home/{user}/flag
+    export FLAG=not_flag
+    FLAG=not_flag
+fi
 /etc/init.d/xinetd start;
 sleep infinity;'''.format(user=dockerfile["docker_username"])
                     conf.write(str)
