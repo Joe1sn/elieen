@@ -60,7 +60,7 @@ class pwn_docker(object):
             else:
                 str += "RUN cp -R /lib* {work_dir} && mkdir {work_dir}/dev && mknod {work_dir}/dev/null c 1 3 && mknod {work_dir}/dev/zero c 1 5 && mknod {work_dir}/dev/random c 1 8 && mknod {work_dir}/dev/urandom c 1 9 && chmod 666 {work_dir}/dev/* && cp /bin/sh {work_dir}/bin && cp /bin/ls {work_dir}/bin && cp /bin/cat {work_dir}/bin\n"
             str += "CMD './{startup_script_name}'\n"
-            str.format(
+            str=str.format(
                 os=tmp_docker["docker_info"]["os"]["release"] + ':' + tmp_docker["docker_info"]["os"]["version"],
                 username=tmp_docker["docker_username"],
                 xinetd_config_filename=tmp_docker["docker_info"]["xinetd_config"],
