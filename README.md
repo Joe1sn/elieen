@@ -18,6 +18,7 @@
       "filename": "babyheap",
       "image_name": "babyheap",
       "docker_username": "pwn1",
+      "image_name":"babyheap",
       "port": 9999,
       "docker_info": {
         "os": {
@@ -67,6 +68,7 @@
 - **project_path**：docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
 - **filename**：二进制文件名字
 - docker_username：docker中运行程序的用户名
+- **image_name**: 镜像文件名称，对ctfd-whale很重要
 - **port**：docker向外暴露的内部的端口
 - **docker_info**：docker相关信息
   - os：docker操作系统相关，一般为发行版
