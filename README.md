@@ -110,4 +110,5 @@ sudo docker-compose build
   | ubuntu20   | libc-2.31.so |
   
 - 该项目构建的docker能够直接在ctfd-whale中启用
+
   因为ctfd-whale是通过 `$FLAG` 传递flag的，docker在启动时的 `service.sh` 脚本会读取环境变量写到对应的flag文件
