@@ -4,6 +4,7 @@ from sys import float_repr_style
 from elieen_help import *
 import os
 import shutil
+import os
 
 
 def read_config(config_filename="config.json"):
@@ -64,7 +65,7 @@ class pwn_docker(object):
                 os=tmp_docker["docker_info"]["os"]["release"] + ':' + tmp_docker["docker_info"]["os"]["version"],
                 username=tmp_docker["docker_username"],
                 xinetd_config_filename=tmp_docker["docker_info"]["xinetd_config"],
-                work_dir="/home/" + tmp_docker["docker_username"],
+                work_dir=os.path.join("/home/" , tmp_docker["docker_username"]),
                 flag='flag{' + md5(bytes(tmp_docker["docker_info"]["flag"], encoding="utf-8")).hexdigest() + '}',
                 filename=tmp_docker["filename"],
                 flag_filename=flag_filename,
@@ -87,7 +88,7 @@ class pwn_docker(object):
                 shutil.copy("./basic/service.sh", path)
                 shutil.copy("./basic/catflag", path)
                 shutil.copy(dockerfile["filename"], path)
-                with open(path+"service.sh","w",encoding='utf-8') as conf:
+                with open(os.path.join(path,"service.sh"),"w",encoding='utf-8') as conf:
                     str = '''
 if [ -n "$FLAG" ]; then
     echo $FLAG > /home/{user}/flag
@@ -193,7 +194,7 @@ class xinetd(object):
                 protocol=xinetd_info["protocol"],
                 user=xinetd_info["user"],
                 port=tmp_xinetd["port"],
-                server_arg=xinetd_info["server_arg"] + " " + "/home/" + tmp_xinetd["docker_username"] + " ./" +
+                server_arg=xinetd_info["server_arg"] + " " + os.path.join("/home/" , tmp_xinetd["docker_username"]) + " ./" +
                            tmp_xinetd["filename"]
             )
 

@@ -1,7 +1,7 @@
 {
   "pwn_dockers": [
     {
-      "project_path": "./pwn1/",
+      "project_path": "./pwn1",
       "filename": "babyheap",
       "image_name": "babyheap",
       "docker_username": "pwn1",

@@ -2,8 +2,7 @@
 
 ![](https://img.shields.io/badge/joe1sn-ELIEEN-green)  ![](https://img.shields.io/badge/python-3.7-yellow)
 
-> 该项目构建的docker能够直接在ctfd-whale中启用
-
+## 配置说明
 之前大家都爱用的：pwn_deploy_chroot要修改版本或者libc很麻烦，要到处找配置修改，所以我想的就是让所有配置信息都在`config.json`中，这样就可以简化配置流程了
 
 将要部署的二进制文件放在该项目目录下
@@ -99,3 +98,16 @@ sudo docker-compose build
 ```
 
 然后使用`sudo docker images`就能看到构建好的docker了
+
+## feature
+
+- 修改对应libc版本只需要设置ubuntu版本即可，如
+
+  | Ubuntu版本 | Glibc版本    |
+  | ---------- | ------------ |
+  | ubuntu16   | libc-2.23.so |
+  | ubuntu18   | libc-2.27.so |
+  | ubuntu20   | libc-2.31.so |
+  
+- 该项目构建的docker能够直接在ctfd-whale中启用
+  因为ctfd-whale是通过 `$FLAG` 传递flag的，docker在启动时的 `service.sh` 脚本会读取环境变量写到对应的flag文件
