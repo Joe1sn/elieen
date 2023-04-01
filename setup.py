@@ -9,5 +9,7 @@ setup(
     author_email='joe1sn@foxmail.com',
     license='Apache',
     packages=['elieen'],
-    install_requires=[],
+    install_requires=[
+        'rich',
+    ],
 )

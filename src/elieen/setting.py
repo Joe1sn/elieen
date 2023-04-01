@@ -35,11 +35,11 @@ class pwn_docker(object):
             docker["project_path"] = project_path
             
             if not os.path.exists(project_path):
-                warn(project_path + "is not exists")
-                warn("now automatic create path " + project_path)
+                warn(project_path,"is not exists")
+                warn("now automatic create path ", project_path)
                 try:
                     os.makedirs(project_path)
-                    succed("path is created")
+                    success("path is created")
                 except Exception as e:
                     error("path in config.json create failed!")
                     error(e)
@@ -78,7 +78,7 @@ class pwn_docker(object):
             return dockerfile
 
     def set_dockerfile(self, dockerfile_name="Dockerfile"):
-        tips("--------GENERATE DOCKERFILE--------")
+        info("--------GENERATE DOCKERFILE--------")
         for dockerfile in self.docker_list:
             try:
                 # path = os.path.join(self.root_dir,dockerfile["project_path"])
@@ -87,9 +87,9 @@ class pwn_docker(object):
                 path = dockerfile["project_path"]
                 with open(os.path.join(path, dockerfile_name), "w", encoding="utf-8") as file:
                     file.write(self.dockerfile(dockerfile))
-                succed(
+                success(
                     "{filename} is generated".format(filename=os.path.join(path, dockerfile_name)))
-                tips("now copy the basic files")
+                info("now copy the basic files")
                 
                 shutil.copy("../bin/catflag", path)
                 shutil.copy(os.path.join(self.root_dir, dockerfile["filename"]), path)
@@ -107,12 +107,12 @@ class pwn_docker(object):
                         user=dockerfile["docker_username"])
                     conf.write(service_sh)
 
-                tips("using command below to build and run docker")
-                tips("  sudo docker build -f {project_dir}Dockerfile -t {image_name} .".format(
+                info("using command below to build and run docker")
+                info("  sudo docker build -f {project_dir}Dockerfile -t {image_name} .".format(
                     project_dir=dockerfile["project_path"],
                     image_name=dockerfile["image_name"]))
 
-                tips("  sudo docker run -p {expose_port}:{docker_port} -d {image_name}".format(
+                info("  sudo docker run -p {expose_port}:{docker_port} -d {image_name}".format(
                     docker_port=dockerfile["port"],
                     image_name=dockerfile["image_name"],
                     expose_port=dockerfile["docker_info"]["expose"]))
@@ -120,10 +120,9 @@ class pwn_docker(object):
                 error("{filename} ocurrd ERROR".format(filename=os.path.join(path, dockerfile_name)))
                 error(e)
                 exit()
-        print()
 
     def docker_composer(self):
-        tips("--------GENERATE DOCKER_COMPOSE--------")
+        info("--------GENERATE DOCKER_COMPOSE--------")
         for dockerfile in self.docker_list:
             try:
                 self.compose_header += "    " + dockerfile["image_name"] + ":\n"
@@ -140,16 +139,15 @@ class pwn_docker(object):
             
             with open(os.path.join(self.root_dir, "docker-compose.yml"), "w") as file:
                 file.write(self.compose_header)
-            succed("docker-compose.yml generate success")
-            tips("use command below to build and run docker")
-            tips(" sudo docker-compose up --build -d")
-            tips("use command below to build dockers")
-            tips(" sudo docker-compose build")
+            success("docker-compose.yml generate success")
+            info("use command below to build and run docker")
+            info(" sudo docker-compose up --build -d")
+            info("use command below to build dockers")
+            info(" sudo docker-compose build")
 
         except Exception as e:
             error("docker-compose.yml generate failed")
             error(e)
-        print()
 
 
 class xinetd(object):
@@ -176,7 +174,7 @@ class xinetd(object):
                 warn("now automatic create path " + project_path)
                 try:
                     os.makedirs(project_path)
-                    succed("path is created")
+                    success("path is created")
                 except Exception as e:
                     error("path in config.json create failed!")
                     error(e)
@@ -213,14 +211,13 @@ class xinetd(object):
         return xinetd_sh      
 
     def set_xinetd(self, xinetd_filename="xinetd.conf") -> None:
-        # tips("--------GENERATE XINETD FILE--------")
+        # info("--------GENERATE XINETD FILE--------")
         for config in self.xinetd_list:
             try:
                 path = config["project_path"]
                 with open(os.path.join(path, xinetd_filename), "w") as file:
                     file.write(xinetd().xinetd_file(config))
-                succed(path + " xinetd config file is generated")
+                success(path, "xinetd config file is generated")
             except (Exception, BaseException) as e:
-                error(path + " xinetd config file ocurrd ERROR")
+                error(path, "xinetd config file ocurrd ERROR")
                 error(e)
-        print()

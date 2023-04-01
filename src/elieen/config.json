@@ -1,5 +1,5 @@
 {
-  "root_dir": "../test",
+  "root_dir": "../../testcase",
   "pwn_dockers": [
     {
       "project_path": "",
