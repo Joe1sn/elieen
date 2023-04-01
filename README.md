@@ -63,8 +63,10 @@
 
 除了 **加粗的** 大多数使用默认参数就行
 
+- **root_dir: 要打包文件有所在根目录**
+
 - pwn_dockers：pwn类配置
-- **project_path**：docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
+- **project_path**：[nullable] docker相关资源的文件夹，也是最后Dockerfile生成的文件夹
 - **filename**：二进制文件名字
 - docker_username：docker中运行程序的用户名
 - **image_name**：镜像文件名称，对ctfd-whale很重要
@@ -88,7 +90,7 @@
 运行
 
 ```shell
-python3 initial.py
+python3 main.py
 ```
 
 得到`docker-compose.yml`
